@@ -20,14 +20,11 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHid
 
 	if(!Widget) return nullptr;
 
-	Widgets.AddUnique(Widget);
+	Widgets.Add(Widget);
 	CurrentWidget = Widget;
 
-	if(IsValid(CurrentWidget))
-	{
-		CurrentWidget->AddToViewport(ZOrder);
-	}
-
+	CurrentWidget->AddToViewport(ZOrder);
+	
 	return CurrentWidget;
 }
 
@@ -35,10 +32,9 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 {
 	if(!IsValid(Class)) return nullptr;
 
-	if(UUserWidget* Widget = CreateWidget<UUserWidget, APlayerController*>(UGameplayStatics::GetPlayerController(this, 0), Class))
+	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld*>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
-		OpenWidget(Widget, bHideOld, ZOrder);
-		return Widget;
+		return OpenWidget(Widget, bHideOld, ZOrder);
 	}
 
 	return nullptr;
