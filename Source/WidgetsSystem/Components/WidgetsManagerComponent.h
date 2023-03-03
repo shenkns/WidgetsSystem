@@ -4,18 +4,18 @@
 
 #include "Components/ActorComponent.h"
 
-#include "WidgetManagerComponent.generated.h"
+#include "WidgetsManagerComponent.generated.h"
 
 class UUserWidget;
 
 UCLASS(ClassGroup = (Widgets), meta = (BlueprintSpawnableComponent))
-class WIDGETSYSTEM_API UWidgetManagerComponent : public UActorComponent
+class WIDGETSSYSTEM_API UWidgetsManagerComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	
-	UWidgetManagerComponent();
+	UWidgetsManagerComponent();
 
 protected:
 

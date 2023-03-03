@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
-class FWidgetSystemModule : public IModuleInterface
+class FWidgetsSystemModule : public IModuleInterface
 {
 public:
 

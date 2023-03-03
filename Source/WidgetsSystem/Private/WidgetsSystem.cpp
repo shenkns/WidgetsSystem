@@ -1,15 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "WidgetSystem.h"
+#include "WidgetsSystem.h"
 
-#define LOCTEXT_NAMESPACE "FWidgetSystemModule"
+#define LOCTEXT_NAMESPACE "FWidgetsSystemModule"
 
-void FWidgetSystemModule::StartupModule()
+void FWidgetsSystemModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 }
 
-void FWidgetSystemModule::ShutdownModule()
+void FWidgetsSystemModule::ShutdownModule()
 {
 	// This function may be called during shutdown to clean up your module.  For modules that support dynamic reloading,
 	// we call this function before unloading the module.
@@ -17,4 +17,4 @@ void FWidgetSystemModule::ShutdownModule()
 
 #undef LOCTEXT_NAMESPACE
 	
-IMPLEMENT_MODULE(FWidgetSystemModule, WidgetSystem)
+IMPLEMENT_MODULE(FWidgetsSystemModule, WidgetsSystem)

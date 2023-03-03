@@ -1,18 +1,17 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Components/WidgetManagerComponent.h"
+#include "Components/WidgetsManagerComponent.h"
 
 #include "Blueprint/UserWidget.h"
 #include "Kismet/GameplayStatics.h"
 
-UWidgetManagerComponent::UWidgetManagerComponent()
+UWidgetsManagerComponent::UWidgetsManagerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
 
-void UWidgetManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
+void UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
 {
 	if(bHideOld && CurrentWidget)
 	{
@@ -27,7 +26,7 @@ void UWidgetManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int
 	Widget->AddToViewport(ZOrder);
 }
 
-UUserWidget* UWidgetManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, int ZOrder)
 {
 	if(!IsValid(Class)) return nullptr;
 
@@ -40,7 +39,7 @@ UUserWidget* UWidgetManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidge
 	return nullptr;
 }
 
-UUserWidget* UWidgetManagerComponent::Back()
+UUserWidget* UWidgetsManagerComponent::Back()
 {
 	if(Widgets.Num() <= 1) return nullptr;
 
@@ -51,7 +50,7 @@ UUserWidget* UWidgetManagerComponent::Back()
 	return Widgets.Last(0);
 }
 
-void UWidgetManagerComponent::BeginPlay()
+void UWidgetsManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 

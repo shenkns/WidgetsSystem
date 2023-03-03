@@ -4,19 +4,19 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "WidgetSystemLibrary.generated.h"
+#include "WidgetsSystemLibrary.generated.h"
 
-class UWidgetManagerComponent;
+class UWidgetsManagerComponent;
 
 UCLASS()
-class WIDGETSYSTEM_API UWidgetSystemLibrary : public UBlueprintFunctionLibrary
+class WIDGETSSYSTEM_API UWidgetsSystemLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
 
 	UFUNCTION(BlueprintPure, Category = "Widgets", meta = (CompactNodeTitle = "WidgetManager"))
-	static UWidgetManagerComponent* GetWidgetManager();
+	static UWidgetsManagerComponent* GetWidgetManager();
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "OpenWidget"))
 	static void OpenWidget(UUserWidget* Widget, bool bHideOld = false, int ZOrder = 0);
