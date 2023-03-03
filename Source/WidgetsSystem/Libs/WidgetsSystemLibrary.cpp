@@ -18,12 +18,12 @@ UWidgetsManagerComponent* UWidgetsSystemLibrary::GetWidgetManager()
 	return HUD->FindComponentByClass<UWidgetsManagerComponent>();
 }
 
-void UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
+UUserWidget* UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
 {
 	const auto WidgetManager = GetWidgetManager();
-	if(!WidgetManager) return;
+	if(!WidgetManager) return nullptr;
 
-	WidgetManager->OpenWidget(Widget, bHideOld, ZOrder);
+	return WidgetManager->OpenWidget(Widget, bHideOld, ZOrder);
 }
 
 UUserWidget* UWidgetsSystemLibrary::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, int ZOrder)

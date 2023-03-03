@@ -31,7 +31,7 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "OpenWidget"))
-	void OpenWidget(UUserWidget* Widget, bool bHideOld = false, int ZOrder = 0);
+	UUserWidget* OpenWidget(UUserWidget* Widget, bool bHideOld = false, int ZOrder = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
 	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld = false, int ZOrder = 0);

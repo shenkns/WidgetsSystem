@@ -11,19 +11,24 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 }
 
 
-void UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
 {
 	if(bHideOld && CurrentWidget)
 	{
 		CurrentWidget->RemoveFromParent();
 	}
 
-	if(!Widget) return;
+	if(!Widget) return nullptr;
 
 	Widgets.AddUnique(Widget);
 	CurrentWidget = Widget;
 
-	Widget->AddToViewport(ZOrder);
+	if(IsValid(CurrentWidget))
+	{
+		CurrentWidget->AddToViewport(ZOrder);
+	}
+
+	return CurrentWidget;
 }
 
 UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, int ZOrder)
