@@ -32,7 +32,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 {
 	if(!IsValid(Class)) return nullptr;
 
-	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld*>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
+	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
 		return OpenWidget(Widget, bHideOld, ZOrder);
 	}
