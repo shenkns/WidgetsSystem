@@ -20,7 +20,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHid
 
 	if(!Widget) return nullptr;
 
-	Widgets.Add(Widget);
+	Widgets.AddUnique(Widget);
 	CurrentWidget = Widget;
 
 	CurrentWidget->AddToViewport(ZOrder);
