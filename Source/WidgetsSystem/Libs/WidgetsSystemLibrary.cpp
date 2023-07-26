@@ -3,13 +3,16 @@
 
 #include "Libs/WidgetsSystemLibrary.h"
 
+#include "../../../../Developer/RiderLink/Source/RD/thirdparty/spdlog/include/spdlog/fmt/bundled/chrono.h"
 #include "Components/WidgetsManagerComponent.h"
 #include "GameFramework/HUD.h"
 #include "Kismet/GameplayStatics.h"
 
 UWidgetsManagerComponent* UWidgetsSystemLibrary::GetWidgetManager()
 {
-	const auto World = GEngine->GameViewport->GetWorld();
+	const auto Viewport = GEngine->GameViewport;
+	if(!Viewport) return nullptr;
+	const auto World = Viewport->GetWorld();
 	if(!World) return nullptr;
 	
 	const auto HUD = UGameplayStatics::GetPlayerController(World, 0)->GetHUD();
