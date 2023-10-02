@@ -13,9 +13,15 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 
 UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
 {
-	if(bHideOld && CurrentWidget)
+	if(bHideOld)
 	{
-		CurrentWidget->RemoveFromParent();
+		for(UUserWidget* OldWidget : Widgets)
+		{
+			if(OldWidget)
+			{
+				OldWidget->RemoveFromParent();
+			}
+		}
 	}
 
 	if(!Widget) return nullptr;
@@ -46,7 +52,17 @@ UUserWidget* UWidgetsManagerComponent::Back()
 
 	Widgets.RemoveAt(Widgets.Num() - 1);
 
-	OpenWidget(Widgets.Last(0), true);
+	if(CurrentWidget)
+	{
+		CurrentWidget->RemoveFromParent();
+	}
+	
+	CurrentWidget = Widgets.Last();
+
+	if(!CurrentWidget->IsInViewport())
+	{
+		CurrentWidget->AddToViewport(0);
+	}
 
 	return Widgets.Last(0);
 }
