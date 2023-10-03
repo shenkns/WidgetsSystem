@@ -11,7 +11,7 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 }
 
 
-UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, bool bClearHistory, int ZOrder)
 {
 	if(bHideOld)
 	{
@@ -24,6 +24,11 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHid
 		}
 	}
 
+	if(bClearHistory)
+	{
+		Widgets.Empty();
+	}
+
 	if(!Widget) return nullptr;
 
 	Widgets.AddUnique(Widget);
@@ -34,13 +39,13 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHid
 	return CurrentWidget;
 }
 
-UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, bool bClearHistory, int ZOrder)
 {
 	if(!IsValid(Class)) return nullptr;
 
 	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
-		return OpenWidget(Widget, bHideOld, ZOrder);
+		return OpenWidget(Widget, bHideOld, bClearHistory, ZOrder);
 	}
 
 	return nullptr;

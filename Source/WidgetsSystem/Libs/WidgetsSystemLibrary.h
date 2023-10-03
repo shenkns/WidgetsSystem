@@ -19,10 +19,10 @@ public:
 	static UWidgetsManagerComponent* GetWidgetManager();
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "OpenWidget"))
-	static UUserWidget* OpenWidget(UUserWidget* Widget, bool bHideOld = false, int ZOrder = 0);
+	static UUserWidget* OpenWidget(UUserWidget* Widget, bool bHideOld = false, bool bClearHistory = false, int ZOrder = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
-	static UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld = false, int ZOrder = 0);
+	static UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld = false, bool bClearHistory = false, int ZOrder = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "Back"))
 	static UUserWidget* Back();
