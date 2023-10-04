@@ -46,18 +46,20 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 
 	case EWidgetOpenMethod::HidePrevious:
 		{
-			CurrentWidget->RemoveFromParent();
+			if(UUserWidget* PreviousWidget = GetCurrentWidget())
+			{
+				PreviousWidget->RemoveFromParent();
+			}
 
 			break;
 		}
 	}
 
 	WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
-	CurrentWidget = Widget;
 
-	CurrentWidget->AddToViewport(ZOrder);
+	Widget->AddToViewport(ZOrder);
 	
-	return CurrentWidget;
+	return Widget;
 }
 
 UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
@@ -76,22 +78,27 @@ UUserWidget* UWidgetsManagerComponent::Back()
 {
 	if(WidgetsHistory.Num() <= 1) return nullptr;
 
+	if(UUserWidget* ClosingWidget = GetCurrentWidget())
+	{
+		ClosingWidget->RemoveFromParent();
+	}
+
 	WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
-
-	if(CurrentWidget)
-	{
-		CurrentWidget->RemoveFromParent();
-	}
 	
-	CurrentWidget = WidgetsHistory.Last().Widget;
-	const int ZOrder = WidgetsHistory.Last().ZOrder;
+	const FWidgetHistory OpenedPreviousWidgetElement = WidgetsHistory.Last();
+	if(!OpenedPreviousWidgetElement.Widget) return nullptr;
 
-	if(!CurrentWidget->IsInViewport())
+	if(!OpenedPreviousWidgetElement.Widget->IsInViewport())
 	{
-		CurrentWidget->AddToViewport(ZOrder);
+		OpenedPreviousWidgetElement.Widget->AddToViewport(OpenedPreviousWidgetElement.ZOrder);
 	}
 
-	return CurrentWidget;
+	return OpenedPreviousWidgetElement.Widget;
+}
+
+UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
+{
+	return WidgetsHistory.Last().Widget;
 }
 
 void UWidgetsManagerComponent::BeginPlay()

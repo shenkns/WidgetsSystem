@@ -46,22 +46,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Widgets")
 	TSubclassOf<UUserWidget> StartWidgetClass;
 
-	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
-	UUserWidget* CurrentWidget;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
+	UPROPERTY(VisibleInstanceOnly, Category = "Widgets")
 	TArray<FWidgetHistory> WidgetsHistory;
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "OpenWidget"))
+	// Widgets management
+	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "OpenWidget"))
 	UUserWidget* OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
 
-	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
+	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
 	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
 
-	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "Back"))
+	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "Back"))
 	UUserWidget* Back();
+
+	// Getters
+	UFUNCTION(BlueprintPure, Category = "WidgetsSystem", meta = (CompactNodeTitle = "CurrentWidget"))
+	UUserWidget* GetCurrentWidget() const;
 	
 protected:
 	
