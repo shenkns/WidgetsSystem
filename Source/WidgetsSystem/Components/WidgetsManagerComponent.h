@@ -18,7 +18,7 @@ enum EWidgetOpenMethod
 };
 
 USTRUCT(BlueprintType)
-struct FWidgetHistory
+struct WIDGETSSYSTEM_API FWidgetHistory
 {
 	GENERATED_BODY()
 
