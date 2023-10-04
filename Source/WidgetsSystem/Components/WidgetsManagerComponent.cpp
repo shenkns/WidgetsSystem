@@ -12,13 +12,13 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder, bool Instant)
 {
 	if(IsLocked()) return nullptr;
 	
 	if(!Widget) return nullptr;
 
-	auto OpenLambda = [this, Widget, ZOrder]()
+	auto OpenLambda = [this, Instant, Widget, ZOrder]()
 	{
 		WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
 
@@ -28,7 +28,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 			Widget->AddToViewport(ZOrder);
 
 			const FWidgetsSystemAnimation OpenAnimation = IWidgetsSystemInterface::Execute_GetWidgetOpenAnimation(Widget);
-			if(OpenAnimation.Animation)
+			if(OpenAnimation.Animation && !Instant)
 			{
 				PlayingTransition = true;
 				Widget->PlayAnimation(
@@ -100,7 +100,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 	return Widget;
 }
 
-UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder, bool Instant)
 {
 	if(IsLocked()) return nullptr;
 	
@@ -108,13 +108,13 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 	
 	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
-		return OpenWidget(Widget, OpenMethod, ZOrder);
+		return OpenWidget(Widget, OpenMethod, ZOrder, Instant);
 	}
 
 	return nullptr;
 }
 
-UUserWidget* UWidgetsManagerComponent::Back()
+UUserWidget* UWidgetsManagerComponent::Back(bool Instant)
 {
 	if(IsLocked()) return nullptr;
 	
@@ -122,7 +122,7 @@ UUserWidget* UWidgetsManagerComponent::Back()
 
 	const FWidgetHistory OpenedPreviousElement = WidgetsHistory.Last(1);
 
-	auto OpenPreviousLambda = [this, OpenedPreviousElement]()
+	auto OpenPreviousLambda = [this, Instant, OpenedPreviousElement]()
 	{
 		UUserWidget* OpenedWidget = OpenedPreviousElement.Widget;
 		if(!OpenedWidget) return;
@@ -135,7 +135,7 @@ UUserWidget* UWidgetsManagerComponent::Back()
 			OpenedWidget->AddToViewport(OpenedPreviousElement.ZOrder);
 
 			const FWidgetsSystemAnimation OpenAnimation = IWidgetsSystemInterface::Execute_GetWidgetOpenAnimation(OpenedWidget);
-			if(OpenAnimation.Animation)
+			if(OpenAnimation.Animation && !Instant)
 			{
 				PlayingTransition = true;
 				
@@ -170,7 +170,7 @@ UUserWidget* UWidgetsManagerComponent::Back()
 
 			const FWidgetsSystemAnimation CloseAnimation = IWidgetsSystemInterface::Execute_GetWidgetCloseAnimation(CurrentWidget);
 
-			if(CloseAnimation.Animation)
+			if(CloseAnimation.Animation && !Instant)
 			{
 				PlayingTransition = true;
 				CurrentWidget->PlayAnimation(

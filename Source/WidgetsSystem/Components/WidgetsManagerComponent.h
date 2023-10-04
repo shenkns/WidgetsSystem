@@ -55,13 +55,13 @@ public:
 
 	// Widgets management
 	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "OpenWidget"))
-	UUserWidget* OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
+	UUserWidget* OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0, bool Instant = false);
 
 	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
-	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
+	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0, bool Instant = false);
 
 	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "Back"))
-	UUserWidget* Back();
+	UUserWidget* Back(bool Instant = false);
 
 	// Getters
 	UFUNCTION(BlueprintPure, Category = "WidgetsSystem", meta = (CompactNodeTitle = "CurrentWidget"))

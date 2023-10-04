@@ -18,26 +18,26 @@ UWidgetsManagerComponent* UWidgetsSystemLibrary::GetWidgetManager()
 	return HUD->FindComponentByClass<UWidgetsManagerComponent>();
 }
 
-UUserWidget* UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
+UUserWidget* UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder, bool Instant)
 {
 	const auto WidgetManager = GetWidgetManager();
 	if(!WidgetManager) return nullptr;
 
-	return WidgetManager->OpenWidget(Widget, OpenMethod, ZOrder);
+	return WidgetManager->OpenWidget(Widget, OpenMethod, ZOrder, Instant);
 }
 
-UUserWidget* UWidgetsSystemLibrary::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
+UUserWidget* UWidgetsSystemLibrary::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder, bool Instant)
 {
 	const auto WidgetManager = GetWidgetManager();
 	if(!WidgetManager) return nullptr;
 
-	return WidgetManager->OpenWidgetFromClass(Class, OpenMethod, ZOrder);
+	return WidgetManager->OpenWidgetFromClass(Class, OpenMethod, ZOrder, Instant);
 }
 
-UUserWidget* UWidgetsSystemLibrary::Back()
+UUserWidget* UWidgetsSystemLibrary::Back(bool Instant)
 {
 	const auto WidgetManager = GetWidgetManager();
 	if(!WidgetManager) return nullptr;
 
-	return WidgetManager->Back();
+	return WidgetManager->Back(Instant);
 }
