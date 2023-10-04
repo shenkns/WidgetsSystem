@@ -49,6 +49,8 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, Category = "Widgets")
 	TArray<FWidgetHistory> WidgetsHistory;
 
+	bool PlayingTransition;
+
 public:
 
 	// Widgets management
@@ -64,6 +66,9 @@ public:
 	// Getters
 	UFUNCTION(BlueprintPure, Category = "WidgetsSystem", meta = (CompactNodeTitle = "CurrentWidget"))
 	UUserWidget* GetCurrentWidget() const;
+
+	UFUNCTION(BlueprintPure, Category = "WidgetsSystem", meta = (CompactNodeTitle = Locked))
+	bool IsLocked() const;
 	
 protected:
 	

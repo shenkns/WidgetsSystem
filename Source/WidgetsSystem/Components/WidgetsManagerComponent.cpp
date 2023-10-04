@@ -2,6 +2,7 @@
 
 #include "Components/WidgetsManagerComponent.h"
 
+#include "Animation/UMGSequencePlayer.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/WidgetsSystemInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -13,16 +14,46 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 
 UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
+	if(IsLocked()) return nullptr;
+	
 	if(!Widget) return nullptr;
 
-	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	auto OpenLambda = [this, Widget, ZOrder]()
 	{
-		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
-		{
-			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
-		}
-	}
+		WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
 
+		if(Widget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			IWidgetsSystemInterface::Execute_WidgetStartOpening(Widget);
+			Widget->AddToViewport(ZOrder);
+
+			const FWidgetsSystemAnimation OpenAnimation = IWidgetsSystemInterface::Execute_GetWidgetOpenAnimation(Widget);
+			if(OpenAnimation.Animation)
+			{
+				PlayingTransition = true;
+				Widget->PlayAnimation(
+					OpenAnimation.Animation,
+					0.f,
+					1,
+					OpenAnimation.Reverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward
+				)->OnSequenceFinishedPlaying().AddWeakLambda(this, [this, Widget](UUMGSequencePlayer& UMGSequencePlayer)
+				{
+					PlayingTransition = false;
+
+					IWidgetsSystemInterface::Execute_WidgetOpened(Widget);
+				});
+			}
+			else
+			{
+				IWidgetsSystemInterface::Execute_WidgetOpened(Widget);
+			}
+		}
+		else
+		{
+			Widget->AddToViewport(ZOrder);
+		}
+	};
+	
 	switch(OpenMethod)
 	{
 	case EWidgetOpenMethod::ClearHistory:
@@ -64,25 +95,17 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 		}
 	}
 
-	WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
-
-	Widget->AddToViewport(ZOrder);
+	OpenLambda();
 	
 	return Widget;
 }
 
 UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
+	if(IsLocked()) return nullptr;
+	
 	if(!IsValid(Class)) return nullptr;
-
-	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
-	{
-		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
-		{
-			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
-		}
-	}
-
+	
 	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
 		return OpenWidget(Widget, OpenMethod, ZOrder);
@@ -93,32 +116,100 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 
 UUserWidget* UWidgetsManagerComponent::Back()
 {
+	if(IsLocked()) return nullptr;
+	
 	if(WidgetsHistory.Num() <= 1) return nullptr;
 
-	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	const FWidgetHistory OpenedPreviousElement = WidgetsHistory.Last(1);
+
+	auto OpenPreviousLambda = [this, OpenedPreviousElement]()
+	{
+		UUserWidget* OpenedWidget = OpenedPreviousElement.Widget;
+		if(!OpenedWidget) return;
+
+		if(OpenedWidget->IsInViewport()) return;
+
+		if(OpenedWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			IWidgetsSystemInterface::Execute_WidgetStartOpening(OpenedWidget);
+			OpenedWidget->AddToViewport(OpenedPreviousElement.ZOrder);
+
+			const FWidgetsSystemAnimation OpenAnimation = IWidgetsSystemInterface::Execute_GetWidgetOpenAnimation(OpenedWidget);
+			if(OpenAnimation.Animation)
+			{
+				PlayingTransition = true;
+				
+				OpenedWidget->PlayAnimation(
+					OpenAnimation.Animation,
+					0.f,
+					1,
+					OpenAnimation.Reverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward
+				)->OnSequenceFinishedPlaying().AddWeakLambda(this, [this, OpenedWidget](UUMGSequencePlayer& UMGSequencePlayer)
+				{
+					PlayingTransition = false;
+					
+					IWidgetsSystemInterface::Execute_WidgetOpened(OpenedWidget);
+				});
+			}
+			else
+			{
+				IWidgetsSystemInterface::Execute_WidgetOpened(OpenedWidget);
+			}
+		}
+		else
+		{
+			OpenedWidget->AddToViewport(OpenedPreviousElement.ZOrder);
+		}
+	};
+
+	if(UUserWidget* CurrentWidget = GetCurrentWidget())
 	{
 		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
 		{
-			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
+			IWidgetsSystemInterface::Execute_WidgetStartClosing(CurrentWidget);
+
+			const FWidgetsSystemAnimation CloseAnimation = IWidgetsSystemInterface::Execute_GetWidgetCloseAnimation(CurrentWidget);
+
+			if(CloseAnimation.Animation)
+			{
+				PlayingTransition = true;
+				CurrentWidget->PlayAnimation(
+					CloseAnimation.Animation,
+					0.f,
+					1,
+					CloseAnimation.Reverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward
+				)->OnSequenceFinishedPlaying().AddWeakLambda(this, [this, CurrentWidget, OpenPreviousLambda](UUMGSequencePlayer& UUMGSequencePlayer)
+				{
+					PlayingTransition = false;
+
+					WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
+					CurrentWidget->RemoveFromParent();
+					
+					IWidgetsSystemInterface::Execute_WidgetClosed(CurrentWidget);
+					
+					OpenPreviousLambda();
+				});
+
+				return OpenedPreviousElement.Widget;
+			}
+			else
+			{
+				WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
+				CurrentWidget->RemoveFromParent();
+				
+				IWidgetsSystemInterface::Execute_WidgetClosed(CurrentWidget);
+			}
+		}
+		else
+		{
+			WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
+			CurrentWidget->RemoveFromParent();
 		}
 	}
 
-	if(UUserWidget* ClosingWidget = GetCurrentWidget())
-	{
-		ClosingWidget->RemoveFromParent();
-	}
+	OpenPreviousLambda();
 
-	WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
-	
-	const FWidgetHistory OpenedPreviousWidgetElement = WidgetsHistory.Last();
-	if(!OpenedPreviousWidgetElement.Widget) return nullptr;
-
-	if(!OpenedPreviousWidgetElement.Widget->IsInViewport())
-	{
-		OpenedPreviousWidgetElement.Widget->AddToViewport(OpenedPreviousWidgetElement.ZOrder);
-	}
-
-	return OpenedPreviousWidgetElement.Widget;
+	return OpenedPreviousElement.Widget;
 }
 
 UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
@@ -129,6 +220,21 @@ UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
 	}
 
 	return nullptr;
+}
+
+bool UWidgetsManagerComponent::IsLocked() const
+{
+	if(PlayingTransition) return true;
+
+	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	{
+		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			return IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget);
+		}
+	}
+
+	return false;
 }
 
 void UWidgetsManagerComponent::BeginPlay()
