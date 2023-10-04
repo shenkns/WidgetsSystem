@@ -88,7 +88,39 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 		{
 			if(UUserWidget* PreviousWidget = GetCurrentWidget())
 			{
-				PreviousWidget->RemoveFromParent();
+				if(PreviousWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+				{
+					IWidgetsSystemInterface::Execute_WidgetStartClosing(PreviousWidget);
+
+					const FWidgetsSystemAnimation CloseAnimation = IWidgetsSystemInterface::Execute_GetWidgetCloseAnimation(PreviousWidget);
+					if(CloseAnimation.Animation)
+					{
+						PlayingTransition = true;
+
+						PreviousWidget->PlayAnimation(
+							CloseAnimation.Animation,
+							0.f,
+							1,
+							CloseAnimation.Reverse ? EUMGSequencePlayMode::Reverse : EUMGSequencePlayMode::Forward
+						)->OnSequenceFinishedPlaying().AddWeakLambda(this, [this, OpenLambda, PreviousWidget](UUMGSequencePlayer& UMGSequencePlayer)
+						{
+							PlayingTransition = false;
+
+							PreviousWidget->RemoveFromParent();
+							IWidgetsSystemInterface::Execute_WidgetClosed(PreviousWidget);
+
+							OpenLambda();
+						});
+
+						return Widget;
+					}
+
+					IWidgetsSystemInterface::Execute_WidgetClosed(PreviousWidget);
+				}
+				else
+				{
+					PreviousWidget->RemoveFromParent();
+				}
 			}
 
 			break;
