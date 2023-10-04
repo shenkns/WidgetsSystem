@@ -3,6 +3,7 @@
 #include "Components/WidgetsManagerComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Interfaces/WidgetsSystemInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 UWidgetsManagerComponent::UWidgetsManagerComponent()
@@ -13,6 +14,14 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
 	if(!Widget) return nullptr;
+
+	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	{
+		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
+		}
+	}
 
 	switch(OpenMethod)
 	{
@@ -66,6 +75,14 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 {
 	if(!IsValid(Class)) return nullptr;
 
+	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	{
+		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
+		}
+	}
+
 	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
 		return OpenWidget(Widget, OpenMethod, ZOrder);
@@ -77,6 +94,14 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 UUserWidget* UWidgetsManagerComponent::Back()
 {
 	if(WidgetsHistory.Num() <= 1) return nullptr;
+
+	if(const UUserWidget* CurrentWidget = GetCurrentWidget())
+	{
+		if(CurrentWidget->GetClass()->ImplementsInterface(UWidgetsSystemInterface::StaticClass()))
+		{
+			if(IWidgetsSystemInterface::Execute_IsWidgetLocked(CurrentWidget)) return nullptr;
+		}
+	}
 
 	if(UUserWidget* ClosingWidget = GetCurrentWidget())
 	{
@@ -98,7 +123,12 @@ UUserWidget* UWidgetsManagerComponent::Back()
 
 UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
 {
-	return WidgetsHistory.Last().Widget;
+	if(WidgetsHistory.Num() >= 1)
+	{
+		return WidgetsHistory.Last().Widget;
+	}
+
+	return nullptr;
 }
 
 void UWidgetsManagerComponent::BeginPlay()
