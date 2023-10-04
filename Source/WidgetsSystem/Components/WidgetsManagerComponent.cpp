@@ -93,7 +93,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 					IWidgetsSystemInterface::Execute_WidgetStartClosing(PreviousWidget);
 
 					const FWidgetsSystemAnimation CloseAnimation = IWidgetsSystemInterface::Execute_GetWidgetCloseAnimation(PreviousWidget);
-					if(CloseAnimation.Animation)
+					if(CloseAnimation.Animation && !Instant)
 					{
 						PlayingTransition = true;
 
