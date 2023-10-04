@@ -10,25 +10,47 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, bool bClearHistory, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
-	if(bHideOld)
+	if(!Widget) return nullptr;
+
+	switch(OpenMethod)
 	{
-		for(const FWidgetHistory& OldWidget : WidgetsHistory)
+	case EWidgetOpenMethod::ClearHistory:
 		{
-			if(OldWidget.Widget)
+			for(const FWidgetHistory& OldWidget : WidgetsHistory)
 			{
-				OldWidget.Widget->RemoveFromParent();
+				if(OldWidget.Widget)
+				{
+					OldWidget.Widget->RemoveFromParent();
+				}
 			}
+
+			WidgetsHistory.Empty();
+			
+			break;
+		}
+		
+	case EWidgetOpenMethod::HideAll:
+		{
+			for(const FWidgetHistory& OldWidget : WidgetsHistory)
+			{
+				if(OldWidget.Widget)
+				{
+					OldWidget.Widget->RemoveFromParent();
+				}
+			}
+
+			break;
+		}
+
+	case EWidgetOpenMethod::HidePrevious:
+		{
+			CurrentWidget->RemoveFromParent();
+
+			break;
 		}
 	}
-
-	if(bClearHistory)
-	{
-		WidgetsHistory.Empty();
-	}
-
-	if(!Widget) return nullptr;
 
 	WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
 	CurrentWidget = Widget;
@@ -38,13 +60,13 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHid
 	return CurrentWidget;
 }
 
-UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, bool bClearHistory, int ZOrder)
+UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
 	if(!IsValid(Class)) return nullptr;
 
 	if(UUserWidget* Widget = CreateWidget<UUserWidget, UWorld>(GetWorld(), Class, FName(FGuid::NewGuid().ToString())))
 	{
-		return OpenWidget(Widget, bHideOld, bClearHistory, ZOrder);
+		return OpenWidget(Widget, OpenMethod, ZOrder);
 	}
 
 	return nullptr;
@@ -76,5 +98,5 @@ void UWidgetsManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	OpenWidgetFromClass(StartWidgetClass, true, 0);
+	OpenWidgetFromClass(StartWidgetClass, EWidgetOpenMethod::ClearHistory, 0);
 }

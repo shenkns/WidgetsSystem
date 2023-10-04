@@ -18,20 +18,20 @@ UWidgetsManagerComponent* UWidgetsSystemLibrary::GetWidgetManager()
 	return HUD->FindComponentByClass<UWidgetsManagerComponent>();
 }
 
-UUserWidget* UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, bool bHideOld, bool bClearHistory, int ZOrder)
+UUserWidget* UWidgetsSystemLibrary::OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
 	const auto WidgetManager = GetWidgetManager();
 	if(!WidgetManager) return nullptr;
 
-	return WidgetManager->OpenWidget(Widget, bHideOld, bClearHistory, ZOrder);
+	return WidgetManager->OpenWidget(Widget, OpenMethod, ZOrder);
 }
 
-UUserWidget* UWidgetsSystemLibrary::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld, bool bClearHistory, int ZOrder)
+UUserWidget* UWidgetsSystemLibrary::OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod, int ZOrder)
 {
 	const auto WidgetManager = GetWidgetManager();
 	if(!WidgetManager) return nullptr;
 
-	return WidgetManager->OpenWidgetFromClass(Class, bHideOld, bClearHistory, ZOrder);
+	return WidgetManager->OpenWidgetFromClass(Class, OpenMethod, ZOrder);
 }
 
 UUserWidget* UWidgetsSystemLibrary::Back()

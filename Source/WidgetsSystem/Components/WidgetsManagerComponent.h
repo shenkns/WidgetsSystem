@@ -8,6 +8,15 @@
 
 class UUserWidget;
 
+UENUM(BlueprintType)
+enum EWidgetOpenMethod
+{
+	Simple,
+	HidePrevious,
+	HideAll,
+	ClearHistory
+};
+
 USTRUCT(BlueprintType)
 struct FWidgetHistory
 {
@@ -46,10 +55,10 @@ protected:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "OpenWidget"))
-	UUserWidget* OpenWidget(UUserWidget* Widget, bool bHideOld = false, bool bClearHistory = false, int ZOrder = 0);
+	UUserWidget* OpenWidget(UUserWidget* Widget, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (DeterminesOutputType = "Class", CompactNodeTitle = "OpenFromClass"))
-	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, bool bHideOld = false, bool bClearHistory = false, int ZOrder = 0);
+	UUserWidget* OpenWidgetFromClass(TSubclassOf<UUserWidget> Class, EWidgetOpenMethod OpenMethod = EWidgetOpenMethod::Simple, int ZOrder = 0);
 
 	UFUNCTION(BlueprintCallable, Category = "Widgets", meta = (CompactNodeTitle = "Back"))
 	UUserWidget* Back();
