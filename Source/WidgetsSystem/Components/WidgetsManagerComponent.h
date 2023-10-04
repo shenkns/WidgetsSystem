@@ -8,6 +8,21 @@
 
 class UUserWidget;
 
+USTRUCT(BlueprintType)
+struct FWidgetHistory
+{
+	GENERATED_BODY()
+
+	FWidgetHistory() {}
+	FWidgetHistory(UUserWidget* HistoryWidget, int HistoryZOrder) : Widget(HistoryWidget), ZOrder(HistoryZOrder) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	UUserWidget* Widget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Widget")
+	int ZOrder;
+};
+
 UCLASS(ClassGroup = (Widgets), meta = (BlueprintSpawnableComponent))
 class WIDGETSSYSTEM_API UWidgetsManagerComponent : public UActorComponent
 {
@@ -26,7 +41,7 @@ protected:
 	UUserWidget* CurrentWidget;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Widgets")
-	TArray<UUserWidget*> Widgets;
+	TArray<FWidgetHistory> WidgetsHistory;
 
 public:
 

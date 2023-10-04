@@ -10,28 +10,27 @@ UWidgetsManagerComponent::UWidgetsManagerComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 }
 
-
 UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, bool bHideOld, bool bClearHistory, int ZOrder)
 {
 	if(bHideOld)
 	{
-		for(UUserWidget* OldWidget : Widgets)
+		for(const FWidgetHistory& OldWidget : WidgetsHistory)
 		{
-			if(OldWidget)
+			if(OldWidget.Widget)
 			{
-				OldWidget->RemoveFromParent();
+				OldWidget.Widget->RemoveFromParent();
 			}
 		}
 	}
 
 	if(bClearHistory)
 	{
-		Widgets.Empty();
+		WidgetsHistory.Empty();
 	}
 
 	if(!Widget) return nullptr;
 
-	Widgets.AddUnique(Widget);
+	WidgetsHistory.Add(FWidgetHistory(Widget, ZOrder));
 	CurrentWidget = Widget;
 
 	CurrentWidget->AddToViewport(ZOrder);
@@ -53,23 +52,24 @@ UUserWidget* UWidgetsManagerComponent::OpenWidgetFromClass(TSubclassOf<UUserWidg
 
 UUserWidget* UWidgetsManagerComponent::Back()
 {
-	if(Widgets.Num() <= 1) return nullptr;
+	if(WidgetsHistory.Num() <= 1) return nullptr;
 
-	Widgets.RemoveAt(Widgets.Num() - 1);
+	WidgetsHistory.RemoveAt(WidgetsHistory.Num() - 1);
 
 	if(CurrentWidget)
 	{
 		CurrentWidget->RemoveFromParent();
 	}
 	
-	CurrentWidget = Widgets.Last();
+	CurrentWidget = WidgetsHistory.Last().Widget;
+	const int ZOrder = WidgetsHistory.Last().ZOrder;
 
 	if(!CurrentWidget->IsInViewport())
 	{
-		CurrentWidget->AddToViewport(0);
+		CurrentWidget->AddToViewport(ZOrder);
 	}
 
-	return Widgets.Last(0);
+	return CurrentWidget;
 }
 
 void UWidgetsManagerComponent::BeginPlay()
