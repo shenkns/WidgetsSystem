@@ -115,6 +115,7 @@ UUserWidget* UWidgetsManagerComponent::OpenWidget(UUserWidget* Widget, EWidgetOp
 						return Widget;
 					}
 
+					PreviousWidget->RemoveFromParent();
 					IWidgetsSystemInterface::Execute_WidgetClosed(PreviousWidget);
 				}
 				else
