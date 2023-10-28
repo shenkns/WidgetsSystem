@@ -245,6 +245,11 @@ UUserWidget* UWidgetsManagerComponent::Back(bool Instant)
 	return OpenedPreviousElement.Widget;
 }
 
+void UWidgetsManagerComponent::Lock(bool Lock)
+{
+	ForceLocked = Lock;
+}
+
 UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
 {
 	if(WidgetsHistory.Num() >= 1)
@@ -257,6 +262,8 @@ UUserWidget* UWidgetsManagerComponent::GetCurrentWidget() const
 
 bool UWidgetsManagerComponent::IsLocked() const
 {
+	if(ForceLocked) return true;
+	
 	if(PlayingTransition) return true;
 
 	if(const UUserWidget* CurrentWidget = GetCurrentWidget())

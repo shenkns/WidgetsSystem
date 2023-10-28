@@ -51,6 +51,8 @@ protected:
 
 	bool PlayingTransition;
 
+	bool ForceLocked;
+
 public:
 
 	// Widgets management
@@ -62,6 +64,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "Back"))
 	UUserWidget* Back(bool Instant = false);
+
+	UFUNCTION(BlueprintCallable, Category = "WidgetsSystem", meta = (CompactNodeTitle = "Lock"))
+	void Lock(bool Lock);
 
 	// Getters
 	UFUNCTION(BlueprintPure, Category = "WidgetsSystem", meta = (CompactNodeTitle = "CurrentWidget"))
