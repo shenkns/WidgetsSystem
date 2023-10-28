@@ -4,7 +4,7 @@
 
 #include "Kismet/BlueprintFunctionLibrary.h"
 
-#include "Components/WidgetsManagerComponent.h"
+#include "WidgetsSystem/Components/WidgetsManagerComponent.h"
 
 #include "WidgetsSystemLibrary.generated.h"
 
