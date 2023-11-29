@@ -2,14 +2,22 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+
+WIDGETSSYSTEM_API DECLARE_LOG_CATEGORY_EXTERN(LogWidgetsSystem, Log, All);
 
 class FWidgetsSystemModule : public IModuleInterface
 {
 public:
-
-	/** IModuleInterface implementation */
+	
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
+
+private:
+
+#if UE_EDITOR
+	// Init System Configuration
+	void RegisterSystemSettings() const;
+	void UnregisterSystemSettings() const;
+#endif
 };
