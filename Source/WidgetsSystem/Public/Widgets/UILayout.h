@@ -27,6 +27,9 @@ private:
 public:
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
+	void ClearLayer(UUILayerData* LayerData);
+	
+	UFUNCTION(BlueprintCallable, Category = "UI")
 	void ClearAllLayers();
 
 	UFUNCTION(BlueprintPure, Category = "UI")

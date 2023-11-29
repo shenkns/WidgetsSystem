@@ -9,9 +9,21 @@
 #include "Data/UILayerData.h"
 #include "Module/WidgetsSystemSettings.h"
 
+void UUILayout::ClearLayer(UUILayerData* LayerData)
+{
+	if(UOverlay** LayerOverlay = Layers.Find(LayerData))
+	{
+		CHECK_RETURN(*LayerOverlay);
+		(*LayerOverlay)->ClearChildren();
+	}
+}
+
 void UUILayout::ClearAllLayers()
 {
-	
+	for(const TTuple<UUILayerData*, UOverlay*>& LayerPair : Layers)
+	{
+		ClearLayer(LayerPair.Key);
+	}
 }
 
 void UUILayout::NativePreConstruct()
