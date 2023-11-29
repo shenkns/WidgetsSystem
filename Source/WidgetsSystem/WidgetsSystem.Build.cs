@@ -15,15 +15,13 @@ public class WidgetsSystem : ModuleRules
 				"WidgetsSystem/"
 			}
 		);
-			
-		
+
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core"
 			}
 		);
-			
 		
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
@@ -32,7 +30,19 @@ public class WidgetsSystem : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-				"UMG"
+				"UMG",
+				"LogSystem",
+				"ManagersSystem",
+				"DataSystem"
+			}
+		);
+		
+		PrivateIncludePathModuleNames.AddRange(
+			new string[]
+			{
+				"LogSystem",
+				"ManagersSystem",
+				"DataSystem"
 			}
 		);
 	}
