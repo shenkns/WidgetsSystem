@@ -4,6 +4,8 @@
 
 #include "UObject/Object.h"
 
+#include "Widgets/UILayout.h"
+
 #include "WidgetsSystemSettings.generated.h"
 
 class UUILayerData;
@@ -14,6 +16,9 @@ class WIDGETSSYSTEM_API UWidgetsSystemSettings : public UObject
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(Config, EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
+	TSubclassOf<UUILayout> UILayoutWidgetClass = UUILayout::StaticClass();
 
 	UPROPERTY(Config, EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
 	TArray<TSoftObjectPtr<UUILayerData>> UILayers;
